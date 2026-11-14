@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { motion, useInView, useReducedMotion } from "motion/react";
 import {
-  ArrowDown, ArrowUp, ArrowUpRight, Cable, Check, CircleAlert, Code, Copy, Ellipsis, GraduationCap, LockKeyhole, Mail, Phone, Server, Smartphone,
+  ArrowDown, ArrowUp, ArrowUpRight, Cable, Check, CircleAlert, Code, Copy, Ellipsis, GraduationCap, LockKeyhole, Mail, Server, Smartphone,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -49,7 +49,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 const githubProfile = "https://github.com/xKayosama";
 const portfolioRepository = `${githubProfile}/my-portfolio`;
 const contactEmail = "layosamikel@gmail.com";
-const contactPhone = "+63 920 387 4079";
 
 type ProjectStatus = "Personal" | "Private" | "Under construction";
 const disabledProjectStatuses = new Set<ProjectStatus>(["Private", "Under construction"]);
@@ -735,12 +734,6 @@ function App() {
                   <ArrowUpRight aria-hidden="true" className="hidden size-4 shrink-0 sm:block" />
                 </a>
                 <CopyContactButton label="Copy email address" value={contactEmail} />
-              </motion.div>
-              <motion.div variants={revealItemVariants} className="flex items-center gap-2">
-                <a href={`tel:${contactPhone.replaceAll(" ", "")}`} className={footerLinkClass}>
-                  <Phone aria-hidden="true" className="size-4 text-blue-400" /> {contactPhone}
-                </a>
-                <CopyContactButton label="Copy phone number" value={contactPhone} />
               </motion.div>
             </div>
           </div>
