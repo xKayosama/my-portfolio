@@ -52,7 +52,6 @@ const contactEmail = "layosamikel@gmail.com";
 const contactPhone = "+63 920 387 4079";
 
 type ProjectStatus = "Personal" | "Private" | "Under construction";
-const portfolioStatus: ProjectStatus = "Under construction";
 const disabledProjectStatuses = new Set<ProjectStatus>(["Private", "Under construction"]);
 
 type Tool = {
@@ -131,11 +130,13 @@ const previewProjects: {
   platform: string;
   preview: string;
   previewAlt: string;
+  liveUrl?: string;
   description: string;
   tools: Tool[];
 }[] = [
   {
     title: "Divvy Web",
+    liveUrl: "https://divvy-xkysma.vercel.app/login",
     platform: "Web application",
     preview: divvyWebPreview,
     previewAlt: "Divvy Web dashboard with sample expense data",
@@ -193,7 +194,12 @@ const eyebrowClass = "text-xs font-semibold uppercase tracking-[0.2em] text-blue
 const headingClass = "mt-3 text-3xl font-semibold tracking-tight sm:text-4xl";
 const cardClass = "rounded-xl border border-border bg-card p-6 text-card-foreground";
 const highlightedCardClass = `${cardClass} transition-shadow hover:shadow-[inset_0_0_24px_#60a5fa33] focus-within:shadow-[inset_0_0_24px_#60a5fa33] motion-reduce:transition-none`;
-const projectStatusClass = "rounded-full border border-border bg-muted px-2.5 py-1 text-xs text-muted-foreground";
+const projectStatusClass = "rounded-full border px-2.5 py-1 text-xs";
+const projectStatusColors: Record<ProjectStatus, string> = {
+  Personal: "border-emerald-400/30 bg-emerald-400/10 text-emerald-300",
+  Private: "border-violet-400/30 bg-violet-400/10 text-violet-300",
+  "Under construction": "border-amber-400/30 bg-amber-400/10 text-amber-300",
+};
 const footerLinkClass = "inline-flex items-center gap-2 rounded-md px-2 py-2 transition-colors hover:bg-blue-400/10 hover:text-blue-300! focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400 motion-reduce:transition-none";
 const toolBadgeClass = "inline-flex items-center gap-2 rounded-full bg-muted px-3 py-1.5";
 const revealItemVariants = {
@@ -368,7 +374,6 @@ function ToolBadges({ tools, collapsible = false }: { tools: Tool[]; collapsible
 function App() {
   const heroRef = useRef<HTMLElement>(null);
   const heroInView = useInView(heroRef);
-  const portfolioDisabled = disabledProjectStatuses.has(portfolioStatus);
   const reduceMotion = useReducedMotion();
   const timelineDotDuration = reduceMotion ? 0 : 0.15;
   const timelineLineDuration = reduceMotion ? 0 : 0.75;
@@ -407,13 +412,13 @@ function App() {
             >
               <motion.p variants={revealItemVariants} className="inline-flex items-center gap-2 rounded-full border border-blue-400/25 bg-blue-400/10 px-4 py-2 text-xs font-semibold tracking-wider text-blue-300">
                 <Code aria-hidden="true" className="size-4" />
-                Software Developer
+                Software Developer · #OpenToWork
               </motion.p>
               <motion.h1 id="home-title" variants={revealItemVariants} className="mt-6 text-[clamp(1.625rem,7vw,2.5rem)] font-semibold tracking-tight sm:text-6xl lg:text-7xl">
                 Hi, I’m <span className="whitespace-nowrap">Michael <span className="text-blue-400">Layosa.</span></span>
               </motion.h1>
               <motion.p variants={revealItemVariants} className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-                I build web and mobile apps, from payroll and attendance tools to Divvy, an app for sharing group expenses.
+                I build payroll, attendance, and reporting tools with <strong className="font-semibold text-foreground">Vue and Nuxt</strong>, and web and mobile expense apps with <strong className="font-semibold text-foreground">React and Express</strong>. I’m open to front-end and back-end developer roles in Manila or remotely.
               </motion.p>
               <motion.div variants={revealItemVariants} className="mt-8 flex flex-wrap justify-center gap-3">
                 <Button nativeButton={false} render={<a href="#projects" />} size="lg" className="h-11 bg-blue-600 px-5 hover:bg-blue-500">
@@ -421,6 +426,9 @@ function App() {
                 </Button>
                 <Button nativeButton={false} render={<a href="#about" />} size="lg" variant="outline" className="h-11 px-5">
                   About me
+                </Button>
+                <Button nativeButton={false} render={<a href="#contact" />} size="lg" variant="outline" className="h-11 px-5">
+                  <Mail aria-hidden="true" /> Contact Me
                 </Button>
               </motion.div>
             </motion.div>
@@ -440,10 +448,10 @@ function App() {
               <p className={eyebrowClass}>01 / About</p>
               <h2 id="about-title" className={headingClass}>A little about me</h2>
               <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-                I’m Michael Layosa, a software developer at Intelliseven. I build interfaces for HR teams, including tools for payroll, attendance, and reporting.
+                I’m a software developer at Intelliseven, where I build payroll, attendance, and reporting tools for HR teams. I work with cross-functional teams to build interactive features and improve application performance, and my front-end experience includes React, Vue 3, and JavaScript.
               </p>
               <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
-                Outside work, I build Divvy, a web and mobile app that helps groups split expenses and keep track of who owes what.
+                Outside work, I’m building Divvy, a web and mobile app that helps groups split expenses and keep track of who owes what. I use Node.js, Express, and MongoDB for its backend.
               </p>
             </motion.div>
             <motion.aside
@@ -527,16 +535,22 @@ function App() {
               variants={{ visible: { transition: { staggerChildren: 0.12 } } }}
             >
               <CarouselContent className="touch-pan-y touch-pinch-zoom sm:grid sm:auto-cols-[50%] sm:grid-flow-col sm:grid-rows-[repeat(6,auto)]">
-                {previewProjects.map(({ title, status = "Personal", platform, preview, previewAlt, description, tools }) => {
+                {previewProjects.map(({ title, status = "Personal", platform, preview, previewAlt, liveUrl, description, tools }) => {
                   const projectDisabled = disabledProjectStatuses.has(status);
                   return (
                     <CarouselItem key={title} aria-label={title} className="sm:row-span-6 sm:grid sm:grid-rows-subgrid">
                       <motion.article variants={revealItemVariants} className={`${projectDisabled ? cardClass : highlightedCardClass} flex h-full flex-col sm:row-span-6 sm:grid sm:grid-rows-subgrid`}>
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <p className={eyebrowClass}>{platform}</p>
-                          <span className={projectStatusClass}>{status}</span>
+                          <span className={`${projectStatusClass} ${projectStatusColors[status]}`}>{status}</span>
                         </div>
-                        <h3 className="mt-3 text-xl font-semibold">{title}</h3>
+                        <h3 className="mt-3 text-xl font-semibold">
+                          {liveUrl ? (
+                            <a href={liveUrl} target="_blank" rel="noopener noreferrer" aria-label={`${title} (opens in a new tab)`} className="rounded-sm hover:text-blue-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400">
+                              {title}
+                            </a>
+                          ) : title}
+                        </h3>
                         <p className="mt-3 leading-relaxed text-muted-foreground">{description}</p>
                         <div className="mt-4 flex aspect-[3/2] items-center justify-center overflow-hidden rounded-lg border border-border bg-background">
                           <img
@@ -556,10 +570,10 @@ function App() {
                           ) : (
                             <Button
                               nativeButton={false}
-                              render={<a href={preview} target="_blank" rel="noopener" aria-label={`View ${title} project preview (opens in a new tab)`} />}
+                              render={<a href={liveUrl ?? preview} target="_blank" rel="noopener noreferrer" aria-label={`${liveUrl ? `Open ${title} live app` : `View ${title} project preview`} (opens in a new tab)`} />}
                               variant="outline"
                             >
-                              View project preview <ArrowUpRight aria-hidden="true" />
+                              {liveUrl ? "View live app" : "View project preview"} <ArrowUpRight aria-hidden="true" />
                             </Button>
                           )}
                         </div>
@@ -567,30 +581,49 @@ function App() {
                     </CarouselItem>
                   );
                 })}
-                <CarouselItem aria-label="Personal portfolio" className="sm:row-span-6">
-                  <motion.article variants={revealItemVariants} className={`${portfolioDisabled ? cardClass : highlightedCardClass} h-full`}>
+                <CarouselItem aria-label="POS" className="sm:row-span-6">
+                  <motion.article variants={revealItemVariants} className={`${cardClass} h-full`}>
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <p className={eyebrowClass}>Web development</p>
-                      <span className={projectStatusClass}>{portfolioStatus}</span>
+                      <span className={`${projectStatusClass} ${projectStatusColors["Under construction"]}`}>Under construction</span>
                     </div>
-                    <h3 className="mt-3 text-xl font-semibold">Personal portfolio</h3>
+                    <h3 className="mt-3 text-xl font-semibold">POS</h3>
                     <p className="mt-3 max-w-lg leading-relaxed text-muted-foreground">
-                      A responsive React site with a mobile navigation drawer and reusable shadcn/ui components.
+                      A point-of-sale application currently under development.
                     </p>
-                    {portfolioDisabled ? (
-                      <Button type="button" variant="outline" disabled className="mt-5">
-                        <LockKeyhole aria-hidden="true" /> View source on GitHub
-                      </Button>
-                    ) : (
-                      <a href={portfolioRepository} className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-blue-400 hover:text-blue-300">
-                        View source on GitHub <ArrowUpRight aria-hidden="true" className="size-4" />
-                      </a>
-                    )}
+                    <Button type="button" variant="outline" disabled className="mt-5">
+                      <LockKeyhole aria-hidden="true" /> Preview unavailable
+                    </Button>
                   </motion.article>
                 </CarouselItem>
               </CarouselContent>
             </motion.div>
           </Carousel>
+          <article aria-labelledby="divvy-case-study" className={`${cardClass} mt-6 sm:p-8`}>
+            <p className={eyebrowClass}>Case study</p>
+            <h3 id="divvy-case-study" className="mt-2 text-2xl font-semibold tracking-tight">Divvy: Splitting shared expenses</h3>
+            <dl className="mt-5 grid gap-x-8 gap-y-5 text-sm leading-relaxed sm:grid-cols-2">
+              <div>
+                <dt className="font-semibold">Problem</dt>
+                <dd className="mt-1 text-muted-foreground">Group expenses aren’t always split evenly. People need to see exactly what each person owes, even when they share different items or the total doesn’t divide evenly.</dd>
+              </div>
+              <div>
+                <dt className="font-semibold">My role</dt>
+                <dd className="mt-1 text-muted-foreground">I built the expense-entry and split-preview flows for Divvy Web and Mobile, along with the Express API that validates and saves the splits.</dd>
+              </div>
+              <div>
+                <dt className="font-semibold">Front end</dt>
+                <dd className="mt-1 text-muted-foreground">Both apps preview each person’s share before saving for equal, exact-amount, percentage, and weighted splits. For itemized expenses, users can assign receipt items to specific people and choose how to allocate tax and tip.</dd>
+              </div>
+              <div>
+                <dt className="font-semibold">Back end</dt>
+                <dd className="mt-1 text-muted-foreground">The API checks that the payer and participants are active group members and recalculates shares before saving. It uses whole units of the currency’s smallest denomination and allocates rounding leftovers so the shares add up to the expense total.</dd>
+              </div>
+            </dl>
+            <p className="mt-5 border-t border-border pt-4 text-sm text-muted-foreground">
+              <strong className="font-semibold text-foreground">Example:</strong> Split ₱100 equally among three people and Divvy assigns ₱33.34, ₱33.33, and ₱33.33.
+            </p>
+          </article>
         </section>
 
         <div className="border-y border-border">
